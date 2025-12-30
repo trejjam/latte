@@ -11,6 +11,7 @@ updates:
       interval: "daily"
     labels:
       - "dependencies"
+      - "composer"
 
   - package-ecosystem: "github-actions"
     directory: "/" # Location of package manifests
@@ -18,3 +19,4 @@ updates:
       interval: "daily"
     labels:
       - "dependencies"
+      - "github-actions"
