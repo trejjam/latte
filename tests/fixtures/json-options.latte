@@ -13,6 +13,9 @@ Pretty:
 {var $html = ['tag' => '<script>alert("xss")</script>']}
 HTML-safe: {$html|json}
 
+<script type="application/json">{$html|json}</script>
+<script type="application/json">{$html}</script>
+
 {* Disable HTML-safe *}
 No HTML-safe: {$html|json:'!html'}
 
