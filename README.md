@@ -48,40 +48,48 @@ latte:
 
 ### `|json`
 
-Encodes value to JSON with optional formatting.
+Encodes value to JSON with granular control options. **HTML-safe by default** (escapes `<`, `>`, `&`, `'`, `"` to prevent XSS).
 
-**Basic usage**:
+**Basic usage** (HTML-safe, unicode-friendly):
 ```latte
 {$data|json}
 ```
 
-**With formatting** (using constant name):
-```latte
-{$data|json:'PRETTY'}
-```
-
-**With flags** (numeric):
-```latte
-{$data|json:256}  {* JSON_UNESCAPED_UNICODE *}
-```
-
-**Available constants**:
-- `PRETTY` - Pretty print with indentation
-- `FORCE_OBJECT` - Force object encoding
-- `UNESCAPED_SLASHES` - Don't escape slashes
-- `UNESCAPED_UNICODE` - Don't escape unicode
+**Options** (multiple string parameters):
+- `pretty` - Pretty print with indentation
+- `ascii` - Escape unicode as `\uXXXX` (for ASCII-only output)
+- `html` - Enable HTML-safe encoding (default, explicit)
+- `!html` - Disable HTML-safe encoding
+- `forceObjects` - Force arrays to objects (empty arrays become `{}`)
 
 **Examples**:
 ```latte
-{* Basic JSON encoding *}
+{* Basic JSON encoding (HTML-safe, unicode) *}
 <script type="application/json">{$config|json|noescape}</script>
 
 {* Pretty printed JSON *}
-<pre>{$data|json:'PRETTY'}</pre>
+<pre>{$data|json:'pretty'}</pre>
 
-{* Multiple flags (numeric values) *}
-{$data|json:320}  {* JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES *}
+{* Pretty + ASCII-safe (for old browsers) *}
+{$data|json:'pretty':'ascii'}
+
+{* Disable HTML-safety for API responses *}
+{$data|json:'!html'}
+
+{* Force objects + pretty print *}
+{$emptyArray|json:'forceObjects':'pretty'}
+{* Output: {} instead of [] *}
+
+{* Multiple options combined *}
+{$data|json:'pretty':'ascii':'forceObjects'}
 ```
+
+**Default behavior**:
+- ✅ HTML-safe (escapes `<>&'"` as `\u003C`, `\u003E`, `\u0026`, `\u0027`, `\u0022`)
+- ✅ Unicode-friendly (preserves UTF-8 characters like `€`, `中`)
+- ✅ Compact output (no indentation)
+
+**Security note**: The default HTML-safe encoding prevents XSS attacks when embedding JSON in HTML `<script>` tags.
 
 ### `|md5`
 

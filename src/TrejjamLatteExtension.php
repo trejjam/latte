@@ -57,27 +57,68 @@ final class TrejjamLatteExtension extends Extension
 	}
 
 	/**
-	 * JSON encoding filter with options support
+	 * JSON encoding filter with granular control options
 	 *
 	 * Usage:
-	 *   {$data|json}                  - basic encoding
-	 *   {$data|json:'PRETTY'}         - with constant name
-	 *   {$data|json:256}              - with numeric flag
+	 *   {$data|json}                           - basic encoding (HTML-safe by default)
+	 *   {$data|json:'pretty'}                  - pretty-printed output
+	 *   {$data|json:'pretty':'ascii'}          - pretty + ASCII-safe
+	 *   {$data|json:'pretty':'!html'}          - pretty + disable HTML-safe
+	 *   {$data|json:'forceObjects'}            - force objects (empty arrays as {})
+	 *
+	 * Options (multiple string parameters):
+	 *   - pretty         : Pretty-print with indentation
+	 *   - ascii          : Escape unicode as \uXXXX
+	 *   - html           : HTML-safe encoding - escapes <, >, &, ', " (enabled by default)
+	 *   - !html          : Disable HTML-safe encoding
+	 *   - forceObjects   : Force arrays to objects
 	 *
 	 * @param mixed $input Value to encode
-	 * @param int|string $options JSON options (numeric or constant name like 'PRETTY')
+	 * @param string ...$options Variable number of option strings
 	 * @return string JSON encoded string
 	 * @throws \Nette\Utils\JsonException
 	 */
-	private function jsonFilter(mixed $input, int|string $options = 0) : string
+	private function jsonFilter(mixed $input, string ...$options) : string
 	{
-		if (is_string($options)) {
-			// Convert string constant to numeric value
-			// Example: 'PRETTY' → Nette\Utils\Json::PRETTY
-			$constantValue = constant(NetteJson::class . '::' . strtoupper($options));
-			$options = is_int($constantValue) ? $constantValue : 0;
+		$pretty = false;
+		$asciiSafe = false;
+		$htmlSafe = true; // Default: HTML-safe encoding
+		$forceObjects = false;
+
+		foreach ($options as $option) {
+			switch (strtolower(trim($option))) {
+				case 'pretty':
+					$pretty = true;
+					break;
+
+				case 'ascii':
+					$asciiSafe = true;
+					break;
+
+				case 'html':
+					$htmlSafe = true;
+					break;
+
+				case '!html':
+					$htmlSafe = false;
+					break;
+
+				case 'forceobjects':
+					$forceObjects = true;
+					break;
+
+				default:
+					// Ignore unknown options for forward compatibility
+					break;
+			}
 		}
 
-		return NetteJson::encode($input, $options);
+		return NetteJson::encode(
+			value: $input,
+			pretty: $pretty,
+			asciiSafe: $asciiSafe,
+			htmlSafe: $htmlSafe,
+			forceObjects: $forceObjects,
+		);
 	}
 }
