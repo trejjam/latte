@@ -87,12 +87,12 @@ final class TrejjamLatteExtension extends Extension
 	 * @throws RuntimeException If used in incompatible content type
 	 * @throws \Nette\Utils\JsonException If JSON encoding fails
 	 */
-	private function jsonFilter(FilterInfo $info, mixed $input, string ...$options) : string
+	private function jsonFilter(FilterInfo $info, mixed $input, string ...$options) : Html|string
 	{
 		if (!in_array($info->contentType, [null, ContentType::JavaScript], true)) {
 			$actualType = $info->contentType ?? 'mixed';
 			throw new RuntimeException(
-							"Filter |json used in incompatible content type $actualType. Expected text or null."
+				"Filter |json used in incompatible content type {$actualType}. Expected text or null."
 			);
 		}
 
@@ -137,10 +137,12 @@ final class TrejjamLatteExtension extends Extension
 			forceObjects: $forceObjects,
 		);
 
-		$info->contentType = "application/json; charset=utf-8";
+		if (!$htmlSafe) {
+			$info->contentType = ContentType::JavaScript;
+		}
 
 		// Return Html when HTML-safe to prevent Latte from double-escaping
 		// Return plain string when !html to allow raw JSON output
-		return $json;
+		return $htmlSafe ? new Html($json) : $json;
 	}
 }

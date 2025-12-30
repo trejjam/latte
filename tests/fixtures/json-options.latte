@@ -12,9 +12,11 @@ Pretty:
 {* HTML-safe (default) *}
 {var $html = ['tag' => '<script>alert("xss")</script>']}
 HTML-safe: {$html|json}
+HTML-safe, pretty: {$html|json:"pretty"}
 
-<script type="application/json">{$html|json}</script>
-<script type="application/json">{$html}</script>
+Custom serializer: <script type="application/json">{$html|json|noescape}</script>
+Custom serializer - no html escaping, pretty: <script type="application/json">{$html|json:"!html","pretty"|noescape}</script>
+Native serializer: <script type="application/json">{$html}</script>
 
 {* Disable HTML-safe *}
 No HTML-safe: {$html|json:'!html'}

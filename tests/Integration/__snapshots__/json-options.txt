@@ -1,7 +1,7 @@
-Basic: &#123;"foo":"bar","items":[1,2,3]}
+Basic: {"foo":"bar","items":[1,2,3]}
 
 Pretty:
-&#123;
+{
     "foo": "bar",
     "items": [
         1,
@@ -10,17 +10,23 @@ Pretty:
     ]
 }
 
-HTML-safe: &#123;"tag":"\u003Cscript\u003Ealert(\u0022xss\u0022)\u003C/script\u003E"}
+HTML-safe: {"tag":"\u003Cscript\u003Ealert(\u0022xss\u0022)\u003C/script\u003E"}
+HTML-safe, pretty: {
+    "tag": "\u003Cscript\u003Ealert(\u0022xss\u0022)\u003C/script\u003E"
+}
 
-<script type="application/json">{"tag":"\u003Cscript\u003Ealert(\u0022xss\u0022)\u003C/script\u003E"}</script>
-<script type="application/json">{"tag":"<script>alert(\"xss\")<\/script>"}</script>
+Custom serializer: <script type="application/json">{"tag":"\u003Cscript\u003Ealert(\u0022xss\u0022)\u003C/script\u003E"}</script>
+Custom serializer - no html escaping, pretty: <script type="application/json">{
+    "tag": "<script>alert(\"xss\")<\/script>"
+}</script>
+Native serializer: <script type="application/json">{"tag":"<script>alert(\"xss\")<\/script>"}</script>
 
 No HTML-safe: &#123;"tag":"&lt;script&gt;alert(\"xss\")&lt;/script&gt;"}
 
-ASCII: &#123;"text":"P\u0159\u00edli\u0161 \u017elu\u0165ou\u010dk\u00fd"}
+ASCII: {"text":"P\u0159\u00edli\u0161 \u017elu\u0165ou\u010dk\u00fd"}
 
-Force objects: &#123;"empty":&#123;}}
+Force objects: {"empty":{}}
 
-Multiple: &#123;
+Multiple: {
     "text": "P\u0159\u00edli\u0161 \u017elu\u0165ou\u010dk\u00fd"
 }
