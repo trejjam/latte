@@ -95,6 +95,8 @@ fn(string $input): string => md5($input)
 ### PHP Features
 - **Strict types**: ALWAYS use `declare(strict_types=1);`
 - **Type declarations**: Use typed properties and parameters
+- **Variadic parameters**: Use `...$args` for variable-length arguments
+- **Named arguments**: Use for clarity when calling functions with many params
 - **Readonly**: Use `readonly` when appropriate
 - **Final classes**: Prefer `final` for classes not meant to be extended
 - **Union types**: Use when needed (`int|string`)
@@ -131,11 +133,11 @@ use Nette\Utils\Json as NetteJson;  // Use alias for clarity
  * Can span multiple lines.
  *
  * @param mixed $input Value to encode
- * @param int|string $options JSON options
+ * @param string ...$options Variable number of option strings
  * @return string JSON encoded string
  * @throws \Nette\Utils\JsonException
  */
-private function jsonFilter(mixed $input, int|string $options = 0) : string
+private function jsonFilter(mixed $input, string ...$options) : string
 ```
 
 ### Error Handling
@@ -172,6 +174,58 @@ $options = constant($class . '::' . $name);
 $constantValue = constant($class . '::' . $name);
 $options = is_int($constantValue) ? $constantValue : 0;
 ```
+
+## Latte Filter Guidelines
+
+### Filter Implementation Pattern
+Filters should use variadic parameters for options and named arguments when calling underlying APIs:
+
+```php
+private function jsonFilter(mixed $input, string ...$options) : string
+{
+    $pretty = false;
+    $asciiSafe = false;
+    $htmlSafe = true; // Secure defaults
+    
+    foreach ($options as $option) {
+        switch (strtolower(trim($option))) {
+            case 'pretty': $pretty = true; break;
+            case 'ascii': $asciiSafe = true; break;
+            case '!html': $htmlSafe = false; break;
+        }
+    }
+    
+    return NetteJson::encode(
+        value: $input,
+        pretty: $pretty,
+        asciiSafe: $asciiSafe,
+        htmlSafe: $htmlSafe,
+    );
+}
+```
+
+### Filter Usage in Templates
+Latte filters use **positional parameters** only (colon-separated):
+
+```latte
+{* Single option *}
+{$data|json:'pretty'}
+
+{* Multiple options (colon-separated) *}
+{$data|json:'pretty':'ascii'}
+
+{* NOT supported (named arguments don't work in Latte) *}
+{$data|json:pretty='true'}  {* WRONG *}
+```
+
+### Best Practices for Filters
+- **Secure defaults**: Enable HTML-safety by default for XSS prevention
+- **String options**: Use descriptive strings, not magic numbers
+- **Variadic params**: Accept `string ...$options` for multiple flags
+- **Named arguments**: Use when calling underlying APIs (e.g., `Json::encode()`)
+- **Case-insensitive**: Normalize options with `strtolower(trim())`
+- **Forward-compatible**: Ignore unknown options silently
+- **Self-documenting**: Option names should match underlying parameter names
 
 ## Git Workflow
 
