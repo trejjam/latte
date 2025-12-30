@@ -183,5 +183,8 @@ jobs:
       - name: "Install dependencies"
         run: "${{ env.composer-install }}"
 
+      - name: "Latte lint"
+        run: "make latte-lint"
+
       - name: "Run tests"
         run: "make test"
