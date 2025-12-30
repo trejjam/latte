@@ -158,6 +158,49 @@ $ok = $linter->scanDirectory($argv[1] ?? '.');
 exit($ok ? 0 : 1);
 ```
 
+## Testing
+
+This package includes comprehensive tests using **nette/tester** with snapshot verification (similar to Verify in C# or Jest snapshots).
+
+### Running Tests
+
+```bash
+make test        # Run all tests (37 test cases)
+make latte-lint  # Lint template fixtures
+make all         # Run all checks (ECS + PHPStan + latte-lint + tests)
+```
+
+### Test Coverage
+
+- **Unit tests** (15 test cases): Direct filter testing
+- **Integration tests** (22 test cases):
+  - Real Latte Engine rendering tests
+  - Latte linter validation tests
+  - Snapshot verification for rendered output
+
+### Snapshot Testing
+
+The integration tests use snapshot verification to ensure rendered output matches expectations. Snapshots are stored in `tests/Integration/__snapshots__/`.
+
+**Updating snapshots** (when filter behavior changes intentionally):
+```bash
+UPDATE_SNAPSHOTS=1 make test
+```
+
+**SnapshotVerifier API** (similar to C# Verify):
+```php
+$snapshots = new SnapshotVerifier(__FILE__);
+
+// Verify text output
+$snapshots->verify($actualOutput, 'test-name');
+
+// Verify JSON output  
+$snapshots->verifyJson($actualData, 'test-name');
+
+// Verify HTML output
+$snapshots->verifyHtml($actualHtml, 'test-name');
+```
+
 ## Development
 
 This package is extracted from `trejjam/utils` to provide standalone Latte 3 filter support.
