@@ -92,7 +92,7 @@ final class TrejjamLatteExtension extends Extension
 		if (!in_array($info->contentType, [null, ContentType::JavaScript, ContentType::Text, ContentType::Html], true)) {
 			$actualType = $info->contentType ?? 'mixed';
 			throw new RuntimeException(
-				"Filter |json used in incompatible content type {$actualType}. Expected text or null."
+				"Filter |json used in incompatible content type {$actualType}. Expected text, html, javascript or null."
 			);
 		}
 
