@@ -1,0 +1,34 @@
+{
+	"name": "trejjam/latte",
+	"description": "Latte template engine extensions and utilities",
+	"keywords": [
+		"latte",
+		"template",
+		"nette"
+	],
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Jan Trejbal"
+		}
+	],
+	"support": {
+		"issues": "https://github.com/trejjam/latte/issues"
+	},
+	"require": {
+		"php": "^8.2 | ^8.3 | ^8.4"
+	},
+	"suggest": {
+
+	},
+	"autoload": {
+		"psr-4": {
+			"Trejjam\\Latte\\": "src/"
+		}
+	},
+	"extra": {
+		"branch-alias": {
+			"dev-master": "v0.1.x-dev"
+		}
+	}
+}
