@@ -1,0 +1,15 @@
+{**
+ * Test MD5 and SHA1 filters
+ *}
+{var $text = 'test'}
+MD5: {$text|md5}
+SHA1: {$text|sha1}
+
+{* Chained with other filters *}
+MD5 Upper: {$text|md5|upper}
+SHA1 Upper: {$text|sha1|upper}
+
+{* In loops *}
+{foreach ['a', 'b', 'c'] as $item}
+- {$item}: MD5={$item|md5}, SHA1={$item|sha1}
+{/foreach}

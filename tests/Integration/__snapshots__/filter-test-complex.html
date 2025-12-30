@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Filter Test</title>
+</head>
+<body>
+	<div class="json-basic">{"string":"test","int":123,"float":45.67,"bool":true,"null":null,"array":[1,2,3],"nested":{"a":"b","c":{"d":"e"}},"unicode":"Příliš žluťoučký kůň","html":"\u003Cscript\u003Ealert(\u0022XSS\u0022)\u003C/script\u003E"}</div>
+	<div class="json-pretty">{
+    "string": "test",
+    "int": 123,
+    "float": 45.67,
+    "bool": true,
+    "null": null,
+    "array": [
+        1,
+        2,
+        3
+    ],
+    "nested": {
+        "a": "b",
+        "c": {
+            "d": "e"
+        }
+    },
+    "unicode": "Příliš žluťoučký kůň",
+    "html": "\u003Cscript\u003Ealert(\u0022XSS\u0022)\u003C/script\u003E"
+}</div>
+	<div class="json-ascii">{"string":"test","int":123,"float":45.67,"bool":true,"null":null,"array":[1,2,3],"nested":{"a":"b","c":{"d":"e"}},"unicode":"P\u0159\u00edli\u0161 \u017elu\u0165ou\u010dk\u00fd k\u016f\u0148","html":"\u003Cscript\u003Ealert(\u0022XSS\u0022)\u003C/script\u003E"}</div>
+	<div class="md5">55502f40dc8b7c769880b10874abc9d0</div>
+	<div class="sha1">567159d622ffbb50b11b0efd307be358624a26ee</div>
+</body>
+</html>

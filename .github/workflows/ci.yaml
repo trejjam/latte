@@ -129,3 +129,62 @@ jobs:
 
       - name: "PHPStan"
         run: "make phpstan"
+
+  tests:
+    name: "Tests"
+    runs-on: "${{ matrix.operating-system }}"
+
+    strategy:
+      matrix:
+        php-version: ["8.2", "8.3", "8.4", "8.5"]
+        operating-system: ["ubuntu-latest"]
+      fail-fast: false
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v4"
+
+      - name: "Setup PHP cache environment"
+        id: "extcache"
+        uses: "shivammathur/cache-extensions@v1"
+        with:
+          php-version: "${{ matrix.php-version }}"
+          extensions: "${{ env.extensions }}"
+          key: "${{ env.cache-version }}-tests"
+
+      - name: "Cache PHP extensions"
+        uses: "actions/cache@v4"
+        with:
+          path: "${{ steps.extcache.outputs.dir }}"
+          key: "${{ steps.extcache.outputs.key }}"
+          restore-keys: "${{ steps.extcache.outputs.key }}"
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          php-version: "${{ matrix.php-version }}"
+          extensions: "${{ env.extensions }}"
+          tools: "composer:${{ env.composer-version }}"
+
+      - name: "Setup problem matchers for PHP"
+        run: 'echo "::add-matcher::${{ runner.tool_cache }}/php.json"'
+
+      - name: "Get Composer cache directory"
+        id: "composercache"
+        run: 'echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT'
+
+      - name: "Cache PHP dependencies"
+        uses: "actions/cache@v4"
+        with:
+          path: "${{ steps.composercache.outputs.dir }}"
+          key: "${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}"
+          restore-keys: "${{ runner.os }}-composer-"
+
+      - name: "Install dependencies"
+        run: "${{ env.composer-install }}"
+
+      - name: "Latte lint"
+        run: "make latte-lint"
+
+      - name: "Run tests"
+        run: "make test"

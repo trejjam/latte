@@ -1,6 +1,6 @@
-.PHONY: all install cs ecs ecsFix phpstan
+.PHONY: all install cs ecs ecsFix phpstan test latte-lint
 
-all: ecs phpstan
+all: ecs phpstan latte-lint test
 	@echo "All checks passed"
 
 install:
@@ -16,3 +16,9 @@ ecsFix:
 
 phpstan:
 	XDEBUG_CONFIG="remote_enable=0" vendor/bin/phpstan analyse -c phpstan.neon
+
+latte-lint:
+	XDEBUG_CONFIG="remote_enable=0" php tests/latte-lint-runner.php
+
+test:
+	XDEBUG_CONFIG="remote_enable=0" vendor/bin/tester -C tests
