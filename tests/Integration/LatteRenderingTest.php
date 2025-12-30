@@ -226,9 +226,8 @@ final class LatteRenderingTest extends TestCase
 
 		$result = $this->latte->renderToString($templateFile, $params);
 
-		// Verify empty array is rendered as {} not [] (note: { is HTML-escaped to &#123;)
-		Assert::contains('"empty":', $result);
-		Assert::contains('&#123;}}', $result); // &#123; is HTML-escaped {
+		// Verify empty array is rendered as {} not [] (note: now returns Html\Node, no escaping)
+		Assert::contains('"empty":{}', $result);
 		Assert::notContains('"empty":[]', $result);
 	}
 

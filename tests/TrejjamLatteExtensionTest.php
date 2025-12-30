@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Trejjam\Latte\Tests;
 
+use Latte\Runtime\Html;
 use Tester\Assert;
 use Tester\TestCase;
 use Trejjam\Latte\TrejjamLatteExtension;
@@ -42,14 +43,17 @@ final class TrejjamLatteExtensionTest extends TestCase
 		$filters = $this->extension->getFilters();
 		$jsonFilter = $filters['json'];
 
-		// Basic encoding
+		// Basic encoding - returns Html\Node by default (HTML-safe mode)
 		$result = $jsonFilter(['foo' => 'bar']);
-		Assert::same('{"foo":"bar"}', $result);
+		Assert::type(Html::class, $result);
+		Assert::same('{"foo":"bar"}', (string) $result);
 
 		// HTML-safe by default (escapes <, >, &, ', ")
 		$result = $jsonFilter(['html' => '<script>alert("XSS")</script>']);
-		Assert::contains('\u003C', $result); // < is escaped
-		Assert::contains('\u003E', $result); // > is escaped
+		Assert::type(Html::class, $result);
+		$resultStr = (string) $result;
+		Assert::contains('\u003C', $resultStr); // < is escaped
+		Assert::contains('\u003E', $resultStr); // > is escaped
 	}
 
 	public function testJsonFilterPretty() : void
@@ -60,9 +64,11 @@ final class TrejjamLatteExtensionTest extends TestCase
 		$data = ['foo' => 'bar', 'nested' => ['key' => 'value']];
 		$result = $jsonFilter($data, 'pretty');
 
-		Assert::contains("\n", $result);
-		Assert::contains('    ', $result); // Nette\Utils\Json uses spaces for indentation
-		Assert::contains('"foo": "bar"', $result);
+		Assert::type(Html::class, $result);
+		$resultStr = (string) $result;
+		Assert::contains("\n", $resultStr);
+		Assert::contains('    ', $resultStr); // Nette\Utils\Json uses spaces for indentation
+		Assert::contains('"foo": "bar"', $resultStr);
 	}
 
 	public function testJsonFilterAscii() : void
@@ -73,10 +79,12 @@ final class TrejjamLatteExtensionTest extends TestCase
 		$data = ['unicode' => 'Příliš žluťoučký kůň'];
 		$result = $jsonFilter($data, 'ascii');
 
+		Assert::type(Html::class, $result);
+		$resultStr = (string) $result;
 		// Unicode characters should be escaped as \uXXXX
-		Assert::notContains('ř', $result);
-		Assert::notContains('ž', $result);
-		Assert::contains('\u', $result);
+		Assert::notContains('ř', $resultStr);
+		Assert::notContains('ž', $resultStr);
+		Assert::contains('\u', $resultStr);
 	}
 
 	public function testJsonFilterHtmlSafe() : void
@@ -86,18 +94,23 @@ final class TrejjamLatteExtensionTest extends TestCase
 
 		$data = ['html' => '<script>alert("test")</script>'];
 
-		// Default: HTML-safe enabled
+		// Default: HTML-safe enabled - returns Html\Node
 		$resultDefault = $jsonFilter($data);
-		Assert::contains('\u003C', $resultDefault);
-		Assert::contains('\u003E', $resultDefault);
+		Assert::type(Html::class, $resultDefault);
+		$resultStr = (string) $resultDefault;
+		Assert::contains('\u003C', $resultStr);
+		Assert::contains('\u003E', $resultStr);
 
-		// Explicit HTML-safe
+		// Explicit HTML-safe - returns Html\Node
 		$resultHtml = $jsonFilter($data, 'html');
-		Assert::contains('\u003C', $resultHtml);
-		Assert::contains('\u003E', $resultHtml);
+		Assert::type(Html::class, $resultHtml);
+		$resultStr = (string) $resultHtml;
+		Assert::contains('\u003C', $resultStr);
+		Assert::contains('\u003E', $resultStr);
 
-		// Disable HTML-safe
+		// Disable HTML-safe - returns plain string
 		$resultNoHtml = $jsonFilter($data, '!html');
+		Assert::type('string', $resultNoHtml);
 		Assert::notContains('\u003C', $resultNoHtml);
 		Assert::notContains('\u003E', $resultNoHtml);
 		Assert::contains('<', $resultNoHtml);
@@ -113,7 +126,8 @@ final class TrejjamLatteExtensionTest extends TestCase
 		$data = ['empty' => []];
 		$result = $jsonFilter($data, 'forceObjects');
 
-		Assert::contains('"empty":{}', $result);
+		Assert::type(Html::class, $result);
+		Assert::contains('"empty":{}', (string) $result);
 	}
 
 	public function testJsonFilterMultipleOptions() : void
@@ -124,13 +138,15 @@ final class TrejjamLatteExtensionTest extends TestCase
 		$data = ['unicode' => 'Příliš', 'html' => '<tag>'];
 		$result = $jsonFilter($data, 'pretty', 'ascii', 'html');
 
+		Assert::type(Html::class, $result);
+		$resultStr = (string) $result;
 		// Should be pretty-printed
-		Assert::contains("\n", $result);
+		Assert::contains("\n", $resultStr);
 		// Should escape unicode
-		Assert::contains('\u', $result);
-		Assert::notContains('ř', $result);
+		Assert::contains('\u', $resultStr);
+		Assert::notContains('ř', $resultStr);
 		// Should be HTML-safe
-		Assert::contains('\u003C', $result);
+		Assert::contains('\u003C', $resultStr);
 	}
 
 	public function testJsonFilterCaseInsensitive() : void
@@ -144,8 +160,9 @@ final class TrejjamLatteExtensionTest extends TestCase
 		$resultUpper = $jsonFilter($data, 'PRETTY');
 		$resultMixed = $jsonFilter($data, 'PrEtTy');
 
-		Assert::same($resultLower, $resultUpper);
-		Assert::same($resultLower, $resultMixed);
+		// All return Html\Node, compare string representations
+		Assert::same((string) $resultLower, (string) $resultUpper);
+		Assert::same((string) $resultLower, (string) $resultMixed);
 	}
 
 	public function testJsonFilterWhitespaceHandling() : void
@@ -158,7 +175,8 @@ final class TrejjamLatteExtensionTest extends TestCase
 		$resultNoSpace = $jsonFilter($data, 'pretty');
 		$resultWithSpace = $jsonFilter($data, '  pretty  ');
 
-		Assert::same($resultNoSpace, $resultWithSpace);
+		// Both return Html\Node, compare string representations
+		Assert::same((string) $resultNoSpace, (string) $resultWithSpace);
 	}
 
 	public function testJsonFilterUnknownOption() : void

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Trejjam\Latte;
 
 use Latte\Extension;
+use Latte\Runtime\Html;
 use Nette\Utils\Json as NetteJson;
 
 /**
@@ -59,26 +60,29 @@ final class TrejjamLatteExtension extends Extension
 	/**
 	 * JSON encoding filter with granular control options
 	 *
+	 * Returns Html\Node when HTML-safe mode is enabled (default) to prevent double-escaping.
+	 * Returns plain string when !html option is used.
+	 *
 	 * Usage:
-	 *   {$data|json}                           - basic encoding (HTML-safe by default)
-	 *   {$data|json:'pretty'}                  - pretty-printed output
-	 *   {$data|json:'pretty':'ascii'}          - pretty + ASCII-safe
-	 *   {$data|json:'pretty':'!html'}          - pretty + disable HTML-safe
+	 *   {$data|json}                           - basic encoding (HTML-safe by default, returns Html\Node)
+	 *   {$data|json:'pretty'}                  - pretty-printed output (returns Html\Node)
+	 *   {$data|json:'pretty':'ascii'}          - pretty + ASCII-safe (returns Html\Node)
+	 *   {$data|json:'pretty':'!html'}          - pretty + disable HTML-safe (returns string)
 	 *   {$data|json:'forceObjects'}            - force objects (empty arrays as {})
 	 *
 	 * Options (multiple string parameters):
 	 *   - pretty         : Pretty-print with indentation
 	 *   - ascii          : Escape unicode as \uXXXX
 	 *   - html           : HTML-safe encoding - escapes <, >, &, ', " (enabled by default)
-	 *   - !html          : Disable HTML-safe encoding
+	 *   - !html          : Disable HTML-safe encoding (returns plain string instead of Html\Node)
 	 *   - forceObjects   : Force arrays to objects
 	 *
 	 * @param mixed $input Value to encode
 	 * @param string ...$options Variable number of option strings
-	 * @return string JSON encoded string
+	 * @return Html|string Returns Html\Node when htmlSafe=true (default), string when htmlSafe=false
 	 * @throws \Nette\Utils\JsonException
 	 */
-	private function jsonFilter(mixed $input, string ...$options) : string
+	private function jsonFilter(mixed $input, string ...$options) : Html|string
 	{
 		$pretty = false;
 		$asciiSafe = false;
@@ -113,12 +117,16 @@ final class TrejjamLatteExtension extends Extension
 			}
 		}
 
-		return NetteJson::encode(
+		$json = NetteJson::encode(
 			value: $input,
 			pretty: $pretty,
 			asciiSafe: $asciiSafe,
 			htmlSafe: $htmlSafe,
 			forceObjects: $forceObjects,
 		);
+
+		// Return Html when HTML-safe to prevent Latte from double-escaping
+		// Return plain string when !html to allow raw JSON output
+		return $htmlSafe ? new Html($json) : $json;
 	}
 }
