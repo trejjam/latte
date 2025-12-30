@@ -1,6 +1,21 @@
-# Latte Extensions
+# Trejjam Latte Extensions
 
-Latte template engine extensions and utilities.
+[![Latest stable](https://img.shields.io/packagist/v/trejjam/latte.svg)](https://packagist.org/packages/trejjam/latte)
+
+Latte 3 template engine extensions and utilities, providing commonly used filters for Nette applications.
+
+## Features
+
+- **JSON Filter**: Encode values to JSON with formatting options
+- **Hash Filters**: MD5 and SHA1 hash generation
+- **Latte 3 Compatible**: Built for Latte 3.x using the Extension API
+- **Linting Support**: Works with `latte-lint` without requiring DI container
+
+## Requirements
+
+- PHP 8.2 or higher
+- Latte 3.0.20 or higher
+- Nette Utils 4.0 or higher
 
 ## Installation
 
@@ -8,10 +23,163 @@ Latte template engine extensions and utilities.
 composer require trejjam/latte
 ```
 
-## Requirements
+## Configuration
 
-- PHP 8.2 or higher
+### Latte 3 Extension (Standalone)
+
+For **latte-lint** or other tools without Nette DI:
+
+```php
+$latte = new Latte\Engine();
+$latte->addExtension(new Trejjam\Latte\TrejjamLatteExtension());
+```
+
+### Nette Configuration
+
+Via Nette configuration (`config.neon`):
+
+```neon
+latte:
+	extensions:
+		- Trejjam\Latte\TrejjamLatteExtension
+```
+
+## Available Filters
+
+### `|json`
+
+Encodes value to JSON with optional formatting.
+
+**Basic usage**:
+```latte
+{$data|json}
+```
+
+**With formatting** (using constant name):
+```latte
+{$data|json:'PRETTY'}
+```
+
+**With flags** (numeric):
+```latte
+{$data|json:256}  {* JSON_UNESCAPED_UNICODE *}
+```
+
+**Available constants**:
+- `PRETTY` - Pretty print with indentation
+- `FORCE_OBJECT` - Force object encoding
+- `UNESCAPED_SLASHES` - Don't escape slashes
+- `UNESCAPED_UNICODE` - Don't escape unicode
+
+**Examples**:
+```latte
+{* Basic JSON encoding *}
+<script type="application/json">{$config|json|noescape}</script>
+
+{* Pretty printed JSON *}
+<pre>{$data|json:'PRETTY'}</pre>
+
+{* Multiple flags (numeric values) *}
+{$data|json:320}  {* JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES *}
+```
+
+### `|md5`
+
+Generates MD5 hash of string.
+
+**Usage**:
+```latte
+{$email|md5}
+{* Output: 5d41402abc4b2a76b9719d911017c592 *}
+
+{* Example: Gravatar URL *}
+<img src="https://www.gravatar.com/avatar/{$email|md5}">
+
+{* Example: Cache busting *}
+<script id="cache-code">{$timestamp|md5}</script>
+```
+
+### `|sha1`
+
+Generates SHA1 hash of string.
+
+**Usage**:
+```latte
+{$password|sha1}
+{* Output: 5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8 *}
+
+{* Example: Simple checksum *}
+<meta name="content-hash" content="{$content|sha1}">
+```
+
+## Migration from trejjam/utils
+
+This package extracts the Latte filters from `trejjam/utils` and provides them as a standalone Latte 3 extension.
+
+### If you're using trejjam/utils
+
+You have two options:
+
+**Option A**: Keep using `trejjam/utils` (once it's updated to v4.0)
+- The filters will continue to work via the DI extension
+
+**Option B**: Migrate to `trejjam/latte` (this package)
+1. Install: `composer require trejjam/latte`
+2. Remove `trejjam.utils.latte` from extensions in `config.neon`
+3. Add `Trejjam\Latte\TrejjamLatteExtension` to `latte.extensions` in `config.neon`
+
+### For latte-lint
+
+Update your `bin/latte-lint` script:
+
+```php
+#!/usr/bin/env php
+<?php
+declare(strict_types=1);
+
+$rootDir = __DIR__ . '/../';
+require $rootDir . 'vendor/autoload.php';
+
+$linter = new Latte\Tools\Linter(debug: false, strict: true);
+$latte = $linter->getEngine();
+
+$latte->setStrictParsing();
+$latte->addExtension(new Trejjam\Latte\TrejjamLatteExtension());  // ← Add this
+
+$ok = $linter->scanDirectory($argv[1] ?? '.');
+exit($ok ? 0 : 1);
+```
+
+## Development
+
+This package is extracted from `trejjam/utils` to provide standalone Latte 3 filter support.
+
+### Original Implementation
+
+The filters were originally implemented in `trejjam/utils` as:
+- `Trejjam\Utils\Latte\Filter\Json`
+- `Trejjam\Utils\Latte\Filter\Md5`
+- `Trejjam\Utils\Latte\Filter\Sha1`
+
+And registered via a Nette DI extension using the deprecated Latte 2.x `addFilter()` method.
+
+### Latte 3 Migration
+
+This package implements the same filters using the Latte 3 Extension API (`getFilters()`), making them:
+- Compatible with latte-lint
+- Independent of Nette DI
+- Following Latte 3 best practices
 
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.
+
+## Author
+
+**Jan Trejbal**
+
+## Links
+
+- [Latte Documentation](https://latte.nette.org/)
+- [Latte Extensions Guide](https://latte.nette.org/en/creating-extension)
+- [Original trejjam/utils](https://github.com/trejjam/Utils)
