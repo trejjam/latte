@@ -20,9 +20,15 @@ final class LatteLintTest extends TestCase
 {
 	private Linter $linter;
 
+	private string $tempDir;
+
 	protected function setUp() : void
 	{
 		parent::setUp();
+
+		// Create dedicated temporary directory for test files
+		$this->tempDir = sys_get_temp_dir() . '/latte-lint-test-' . uniqid();
+		mkdir($this->tempDir, 0755);
 
 		// Initialize Latte linter with strict mode
 		$this->linter = new Linter(
@@ -34,6 +40,20 @@ final class LatteLintTest extends TestCase
 		$latte = $this->linter->getEngine();
 		$latte->setStrictParsing();
 		$latte->addExtension(new TrejjamLatteExtension());
+	}
+
+	protected function tearDown() : void
+	{
+		// Clean up temporary directory and all files within
+		if (is_dir($this->tempDir)) {
+			$files = array_diff(scandir($this->tempDir) ?: [], ['.', '..']);
+			foreach ($files as $file) {
+				unlink($this->tempDir . '/' . $file);
+			}
+			rmdir($this->tempDir);
+		}
+
+		parent::tearDown();
 	}
 
 	public function testLintFixturesDirectory() : void
@@ -82,7 +102,7 @@ final class LatteLintTest extends TestCase
 
 	public function testLintInvalidSyntax() : void
 	{
-		$invalidTemplate = __DIR__ . '/../fixtures/invalid-syntax.latte';
+		$invalidTemplate = $this->tempDir . '/invalid-syntax.latte';
 
 		// Create a template with invalid Latte syntax
 		file_put_contents($invalidTemplate, '{if $test}Unclosed if');
@@ -92,13 +112,12 @@ final class LatteLintTest extends TestCase
 		// Should fail because of syntax error
 		Assert::false($ok, 'Template with syntax error should fail linting');
 
-		// Clean up
-		@unlink($invalidTemplate);
+		// No manual cleanup needed - tearDown() handles it
 	}
 
 	public function testLintValidJsonFilter() : void
 	{
-		$validTemplate = __DIR__ . '/../fixtures/valid-json.latte';
+		$validTemplate = $this->tempDir . '/valid-json.latte';
 
 		// Create a template with valid JSON filter usage
 		file_put_contents($validTemplate, '{var $data = ["test" => "value"]}{$data|json}');
@@ -107,13 +126,12 @@ final class LatteLintTest extends TestCase
 
 		Assert::true($ok, 'Template with valid JSON filter should pass linting');
 
-		// Clean up
-		@unlink($validTemplate);
+		// No manual cleanup needed - tearDown() handles it
 	}
 
 	public function testLintValidHashFilters() : void
 	{
-		$validTemplate = __DIR__ . '/../fixtures/valid-hash.latte';
+		$validTemplate = $this->tempDir . '/valid-hash.latte';
 
 		// Create a template with valid hash filters
 		file_put_contents($validTemplate, '{var $text = "test"}{$text|md5} {$text|sha1}');
@@ -122,13 +140,12 @@ final class LatteLintTest extends TestCase
 
 		Assert::true($ok, 'Template with valid hash filters should pass linting');
 
-		// Clean up
-		@unlink($validTemplate);
+		// No manual cleanup needed - tearDown() handles it
 	}
 
 	public function testLintChainedFilters() : void
 	{
-		$validTemplate = __DIR__ . '/../fixtures/valid-chained.latte';
+		$validTemplate = $this->tempDir . '/valid-chained.latte';
 
 		// Create a template with chained filters
 		file_put_contents($validTemplate, '{var $text = "test"}{$text|md5|upper}');
@@ -137,8 +154,7 @@ final class LatteLintTest extends TestCase
 
 		Assert::true($ok, 'Template with chained filters should pass linting');
 
-		// Clean up
-		@unlink($validTemplate);
+		// No manual cleanup needed - tearDown() handles it
 	}
 }
 

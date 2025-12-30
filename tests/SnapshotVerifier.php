@@ -23,7 +23,7 @@ final class SnapshotVerifier
 		$this->snapshotDir = $testDir . '/__snapshots__';
 
 		if (!is_dir($this->snapshotDir)) {
-			mkdir($this->snapshotDir, 0777, true);
+			mkdir($this->snapshotDir, 0755, true);
 		}
 	}
 

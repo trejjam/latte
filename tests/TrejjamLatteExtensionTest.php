@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Trejjam\Latte\Tests;
 
+use Latte\ContentType;
 use Latte\Runtime\FilterInfo;
 use Latte\Runtime\Html;
+use RuntimeException;
 use Tester\Assert;
 use Tester\TestCase;
 use Trejjam\Latte\TrejjamLatteExtension;
@@ -206,6 +208,46 @@ final class TrejjamLatteExtensionTest extends TestCase
 			$filterInfo = new FilterInfo();
 			$jsonFilter($filterInfo, $data, 'unknownOption', 'anotherUnknown');
 		});
+	}
+
+	public function testJsonFilterContentTypeValidation() : void
+	{
+		$filters = $this->extension->getFilters();
+		$jsonFilter = $filters['json'];
+
+		$data = ['test' => 'value'];
+
+		// Should work with null content type (text)
+		Assert::noError(function () use ($jsonFilter, $data) {
+			$filterInfo = new FilterInfo(null);
+			$jsonFilter($filterInfo, $data);
+		});
+
+		// Should work with JavaScript content type
+		Assert::noError(function () use ($jsonFilter, $data) {
+			$filterInfo = new FilterInfo(ContentType::JavaScript);
+			$jsonFilter($filterInfo, $data);
+		});
+
+		// Should throw RuntimeException with incompatible content type (e.g., Html)
+		Assert::exception(
+			function () use ($jsonFilter, $data) {
+				$filterInfo = new FilterInfo(ContentType::Html);
+				$jsonFilter($filterInfo, $data);
+			},
+			RuntimeException::class,
+			'Filter |json used in incompatible content type html. Expected text or null.'
+		);
+
+		// Should throw RuntimeException with Css content type
+		Assert::exception(
+			function () use ($jsonFilter, $data) {
+				$filterInfo = new FilterInfo(ContentType::Css);
+				$jsonFilter($filterInfo, $data);
+			},
+			RuntimeException::class,
+			'Filter |json used in incompatible content type css. Expected text or null.'
+		);
 	}
 
 	public function testMd5Filter() : void

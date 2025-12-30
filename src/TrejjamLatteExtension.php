@@ -83,7 +83,7 @@ final class TrejjamLatteExtension extends Extension
 	 * @param FilterInfo $info Latte filter context (validates contentType)
 	 * @param mixed $input Value to encode
 	 * @param string ...$options Variable number of option strings
-	 * @return string
+	 * @return Html|string Returns Html when htmlSafe=true (default), string when htmlSafe=false
 	 * @throws RuntimeException If used in incompatible content type
 	 * @throws \Nette\Utils\JsonException If JSON encoding fails
 	 */

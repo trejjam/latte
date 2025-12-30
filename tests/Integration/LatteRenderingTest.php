@@ -41,7 +41,7 @@ final class LatteRenderingTest extends TestCase
 		// Create temp directory for compiled templates (unique per test to avoid parallel conflicts)
 		$this->tempDir = __DIR__ . '/../temp/' . getmypid() . '-' . uniqid();
 		if (!is_dir($this->tempDir)) {
-			mkdir($this->tempDir, 0777, true);
+			mkdir($this->tempDir, 0755, true);
 		}
 
 		// Initialize Latte engine
