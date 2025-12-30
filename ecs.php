@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use PhpCsFixer\Fixer\Basic\CurlyBracesPositionFixer;
-use PhpCsFixer\Fixer\ControlStructure\ControlStructureContinuationPositionFixer;
 use PhpCsFixer\Fixer\FunctionNotation\ReturnTypeDeclarationFixer;
 use PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer;
 use PhpCsFixer\Fixer\PhpTag\BlankLineAfterOpeningTagFixer;
@@ -35,11 +33,5 @@ return static function (ECSConfig $ecsConfig) use ($rootDir) : void {
 
 	$ecsConfig->ruleWithConfiguration(ReturnTypeDeclarationFixer::class, [
 		'space_before' => 'one',
-	]);
-	$ecsConfig->ruleWithConfiguration(ControlStructureContinuationPositionFixer::class, [
-		'position' => ControlStructureContinuationPositionFixer::NEXT_LINE,
-	]);
-	$ecsConfig->ruleWithConfiguration(CurlyBracesPositionFixer::class, [
-		'functions_opening_brace' => CurlyBracesPositionFixer::NEXT_LINE_UNLESS_NEWLINE_AT_SIGNATURE_END,
 	]);
 };
