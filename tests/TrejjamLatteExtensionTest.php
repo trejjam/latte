@@ -236,7 +236,7 @@ final class TrejjamLatteExtensionTest extends TestCase
 				$jsonFilter($filterInfo, $data);
 			},
 			RuntimeException::class,
-			'Filter |json used in incompatible content type ical. Expected text or null.'
+			'Filter |json used in incompatible content type ical. Expected text, html, javascript or null.'
 		);
 
 		// Should throw RuntimeException with Css content type
@@ -246,7 +246,7 @@ final class TrejjamLatteExtensionTest extends TestCase
 				$jsonFilter($filterInfo, $data);
 			},
 			RuntimeException::class,
-			'Filter |json used in incompatible content type css. Expected text or null.'
+			'Filter |json used in incompatible content type css. Expected text, html, javascript or null.'
 		);
 	}
 
