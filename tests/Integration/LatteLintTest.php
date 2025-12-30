@@ -27,7 +27,14 @@ final class LatteLintTest extends TestCase
 		parent::setUp();
 
 		// Create dedicated temporary directory for test files
-		$this->tempDir = sys_get_temp_dir() . '/latte-lint-test-' . uniqid();
+		// Use getmypid() + uniqid() for better uniqueness
+		$this->tempDir = sys_get_temp_dir() . '/latte-lint-test-' . getmypid() . '-' . uniqid();
+		
+		// Clean up if directory somehow already exists
+		if (is_dir($this->tempDir)) {
+			$this->cleanupTempDir();
+		}
+		
 		mkdir($this->tempDir, 0755);
 
 		// Initialize Latte linter with strict mode
@@ -44,6 +51,12 @@ final class LatteLintTest extends TestCase
 
 	protected function tearDown() : void
 	{
+		$this->cleanupTempDir();
+		parent::tearDown();
+	}
+
+	private function cleanupTempDir() : void
+	{
 		// Clean up temporary directory and all files within
 		if (is_dir($this->tempDir)) {
 			$files = array_diff(scandir($this->tempDir) ?: [], ['.', '..']);
@@ -52,8 +65,6 @@ final class LatteLintTest extends TestCase
 			}
 			rmdir($this->tempDir);
 		}
-
-		parent::tearDown();
 	}
 
 	public function testLintFixturesDirectory() : void
