@@ -80,14 +80,14 @@ final class TrejjamLatteExtension extends Extension
 	 *   - !html          : Disable HTML-safe encoding (returns plain string instead of Html)
 	 *   - forceObjects   : Force arrays to objects
 	 *
-	 * @param FilterInfo $info Latte filter context (contentType validation)
+	 * @param FilterInfo $info Latte filter context (validates contentType)
 	 * @param mixed $input Value to encode
 	 * @param string ...$options Variable number of option strings
-	 * @return Html|string Returns Html when htmlSafe=true (default), string when htmlSafe=false
+	 * @return string
 	 * @throws RuntimeException If used in incompatible content type
 	 * @throws \Nette\Utils\JsonException If JSON encoding fails
 	 */
-	private function jsonFilter(FilterInfo $info, mixed $input, string ...$options) : Html|string
+	private function jsonFilter(FilterInfo $info, mixed $input, string ...$options) : string
 	{
 		if (!in_array($info->contentType, [null, ContentType::JavaScript], true)) {
 			$actualType = $info->contentType ?? 'mixed';
@@ -137,8 +137,10 @@ final class TrejjamLatteExtension extends Extension
 			forceObjects: $forceObjects,
 		);
 
+		$info->contentType = "application/json; charset=utf-8";
+
 		// Return Html when HTML-safe to prevent Latte from double-escaping
 		// Return plain string when !html to allow raw JSON output
-		return $htmlSafe ? new Html($json) : $json;
+		return $json;
 	}
 }
