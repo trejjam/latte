@@ -16,7 +16,7 @@
 		"issues": "https://github.com/trejjam/latte/issues"
 	},
 	"require": {
-		"php": "^8.2 | ^8.3 | ^8.4",
+		"php": "^8.2 | ^8.3 | ^8.4 | ^8.5",
 
 		"latte/latte": "^3.0.20",
 		"nette/utils": "^4.0"
