@@ -232,11 +232,11 @@ final class TrejjamLatteExtensionTest extends TestCase
 		// Should throw RuntimeException with incompatible content type (e.g., Html)
 		Assert::exception(
 			function () use ($jsonFilter, $data) {
-				$filterInfo = new FilterInfo(ContentType::Html);
+				$filterInfo = new FilterInfo(ContentType::ICal);
 				$jsonFilter($filterInfo, $data);
 			},
 			RuntimeException::class,
-			'Filter |json used in incompatible content type html. Expected text or null.'
+			'Filter |json used in incompatible content type ical. Expected text or null.'
 		);
 
 		// Should throw RuntimeException with Css content type
