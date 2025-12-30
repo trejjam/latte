@@ -1,6 +1,6 @@
-.PHONY: all install cs ecs ecsFix phpstan
+.PHONY: all install cs ecs ecsFix phpstan test
 
-all: ecs phpstan
+all: ecs phpstan test
 	@echo "All checks passed"
 
 install:
@@ -16,3 +16,6 @@ ecsFix:
 
 phpstan:
 	XDEBUG_CONFIG="remote_enable=0" vendor/bin/phpstan analyse -c phpstan.neon
+
+test:
+	XDEBUG_CONFIG="remote_enable=0" vendor/bin/tester -C tests
