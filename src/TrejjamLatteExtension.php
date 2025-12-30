@@ -89,7 +89,7 @@ final class TrejjamLatteExtension extends Extension
 	 */
 	private function jsonFilter(FilterInfo $info, mixed $input, string ...$options) : Html|string
 	{
-		if (!in_array($info->contentType, [null, ContentType::JavaScript], true)) {
+		if (!in_array($info->contentType, [null, ContentType::JavaScript, ContentType::Text, ContentType::Html], true)) {
 			$actualType = $info->contentType ?? 'mixed';
 			throw new RuntimeException(
 				"Filter |json used in incompatible content type {$actualType}. Expected text or null."
@@ -98,7 +98,7 @@ final class TrejjamLatteExtension extends Extension
 
 		$pretty = false;
 		$asciiSafe = false;
-		$htmlSafe = true; // Default: HTML-safe encoding
+		$htmlSafe = $info->contentType !== ContentType::JavaScript; // Default: HTML-safe encoding
 		$forceObjects = false;
 
 		foreach ($options as $option) {
