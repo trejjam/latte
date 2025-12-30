@@ -1,0 +1,13 @@
+# This file defines code ownership for the repository
+# When a pull request is created, GitHub will automatically request reviews
+# from the owners of the modified files.
+#
+# More info: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything in the repo
+* @trejjam
+
+# Dependabot PRs will automatically assign ownership based on changed files
+/.github/ @trejjam
+/composer.json @trejjam
+/composer.lock @trejjam
