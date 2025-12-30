@@ -1,0 +1,16 @@
+{**
+ * Test template for filter rendering
+ *}
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Filter Test</title>
+</head>
+<body>
+	<div class="json-basic">{$jsonData|json}</div>
+	<div class="json-pretty">{$jsonData|json:'pretty'}</div>
+	<div class="json-ascii">{$jsonData|json:'ascii'}</div>
+	<div class="md5">{$textData|md5}</div>
+	<div class="sha1">{$textData|sha1}</div>
+</body>
+</html>

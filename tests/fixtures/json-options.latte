@@ -1,0 +1,28 @@
+{**
+ * Test JSON filter with various options
+ *}
+{* Basic JSON *}
+{var $data = ['foo' => 'bar', 'items' => [1, 2, 3]]}
+Basic: {$data|json}
+
+{* Pretty print *}
+Pretty:
+{$data|json:'pretty'}
+
+{* HTML-safe (default) *}
+{var $html = ['tag' => '<script>alert("xss")</script>']}
+HTML-safe: {$html|json}
+
+{* Disable HTML-safe *}
+No HTML-safe: {$html|json:'!html'}
+
+{* ASCII-safe *}
+{var $unicode = ['text' => 'Příliš žluťoučký']}
+ASCII: {$unicode|json:'ascii'}
+
+{* Force objects *}
+{var $empty = ['empty' => []]}
+Force objects: {$empty|json:'forceObjects'}
+
+{* Multiple options *}
+Multiple: {$unicode|json:'pretty', 'ascii', 'html'}
