@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Trejjam\Latte\DI;
 
-use Latte\Engine;
 use Nette\DI\CompilerExtension;
+use Nette\DI\Definitions\FactoryDefinition;
 use Nette\DI\Definitions\ServiceDefinition;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
@@ -45,25 +45,48 @@ final class LatteExtension extends CompilerExtension
 	/**
 	 * Register Latte extension before container compilation
 	 *
-	 * Hooks into the Latte Engine service and adds TrejjamLatteExtension
+	 * Hooks into the Latte Engine factory service and adds TrejjamLatteExtension
 	 * to provide json, md5, and sha1 filters.
+	 *
+	 * Note: This extension requires 'latte.latteFactory' service to be registered.
+	 * If using nette/application, ensure the 'latte' extension is registered first.
+	 * Alternatively, register TrejjamLatteExtension directly in latte.extensions config.
 	 */
 	public function beforeCompile() : void
 	{
 		$builder = $this->getContainerBuilder();
 
-		// Find the Latte Engine service by type
-		$latteDefinition = $builder->getDefinitionByType(Engine::class);
-
-		// Ensure we have a ServiceDefinition (not just Definition)
-		if (!$latteDefinition instanceof ServiceDefinition) {
+		// Check if Latte factory service exists
+		if (!$builder->hasDefinition('latte.latteFactory')) {
+			// Latte factory not registered - skip auto-registration
+			// User should either:
+			// 1. Register nette/application's latte extension first, or
+			// 2. Register TrejjamLatteExtension directly in latte.extensions config
 			return;
 		}
 
-		// Register TrejjamLatteExtension with the Latte engine
-		$latteDefinition->addSetup(
-			'addExtension',
-			[new TrejjamLatteExtension()]
-		);
+		// Register TrejjamLatteExtension as a service
+		$builder->addDefinition($this->prefix('extension'))
+			->setFactory(TrejjamLatteExtension::class)
+			->setAutowired(false);
+
+		// Get the factory definition
+		$latteFactoryDefinition = $builder->getDefinition('latte.latteFactory');
+
+		// Handle FactoryDefinition (nette/application 3.2+)
+		if ($latteFactoryDefinition instanceof FactoryDefinition) {
+			$latteFactoryDefinition->getResultDefinition()
+				->addSetup('addExtension', [$builder->getDefinition($this->prefix('extension'))]);
+			return;
+		}
+
+		// Handle ServiceDefinition (older versions or direct Engine registration)
+		if ($latteFactoryDefinition instanceof ServiceDefinition) {
+			$latteFactoryDefinition->addSetup(
+				'addExtension',
+				[$builder->getDefinition($this->prefix('extension'))]
+			);
+			return;
+		}
 	}
 }
