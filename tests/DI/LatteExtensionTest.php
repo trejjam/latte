@@ -101,6 +101,7 @@ final class LatteExtensionTest extends TestCase
 
 		/** @var Engine $latte */
 		$latte = $container->getService('latte.latteFactory');
+		$latte->setLoader(new \Latte\Loaders\StringLoader());
 
 		// Render a simple template using the json filter to verify extension is loaded
 		$result = $latte->renderToString('{$data|json}', ['data' => ['test' => 'value']]);
@@ -114,6 +115,7 @@ final class LatteExtensionTest extends TestCase
 
 		/** @var Engine $latte */
 		$latte = $container->getService('latte.latteFactory');
+		$latte->setLoader(new \Latte\Loaders\StringLoader());
 
 		// Test basic json filter
 		$result = $latte->renderToString('{$data|json}', ['data' => ['foo' => 'bar']]);
@@ -127,6 +129,7 @@ final class LatteExtensionTest extends TestCase
 
 		/** @var Engine $latte */
 		$latte = $container->getService('latte.latteFactory');
+		$latte->setLoader(new \Latte\Loaders\StringLoader());
 
 		// Test md5 filter
 		$result = $latte->renderToString('{$value|md5}', ['value' => 'test']);
@@ -139,6 +142,7 @@ final class LatteExtensionTest extends TestCase
 
 		/** @var Engine $latte */
 		$latte = $container->getService('latte.latteFactory');
+		$latte->setLoader(new \Latte\Loaders\StringLoader());
 
 		// Test sha1 filter
 		$result = $latte->renderToString('{$value|sha1}', ['value' => 'test']);
@@ -164,6 +168,7 @@ final class LatteExtensionTest extends TestCase
 
 		/** @var Engine $latte */
 		$latte = $container->getService('latte.latteFactory');
+		$latte->setLoader(new \Latte\Loaders\StringLoader());
 
 		// Test json filter with multiple options
 		$data = ['unicode' => 'Příliš'];
