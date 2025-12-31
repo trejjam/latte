@@ -19,6 +19,7 @@
 		"php": "^8.2 | ^8.3 | ^8.4 | ^8.5",
 
 		"latte/latte": "^3.0.20",
+		"nette/di": "^3.2",
 		"nette/utils": "^4.0"
 	},
 	"require-dev": {
@@ -58,6 +59,11 @@
 	"extra": {
 		"branch-alias": {
 			"dev-master": "v0.1.x-dev"
+		},
+		"nette": {
+			"extensions": {
+				"trejjam.latte": "Trejjam\\Latte\\DI\\LatteExtension"
+			}
 		}
 	}
 }

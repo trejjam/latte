@@ -9,12 +9,14 @@ Latte 3 template engine extensions and utilities, providing commonly used filter
 - **JSON Filter**: Encode values to JSON with formatting options
 - **Hash Filters**: MD5 and SHA1 hash generation
 - **Latte 3 Compatible**: Built for Latte 3.x using the Extension API
+- **Auto-Configuration**: Automatic registration with Nette DI via Composer
 - **Linting Support**: Works with `latte-lint` without requiring DI container
 
 ## Requirements
 
 - PHP 8.2 or higher
 - Latte 3.0.20 or higher
+- Nette DI 3.2 or higher
 - Nette Utils 4.0 or higher
 
 ## Installation
@@ -23,25 +25,40 @@ Latte 3 template engine extensions and utilities, providing commonly used filter
 composer require trejjam/latte
 ```
 
+**That's it!** If you're using Nette DI, the extension is automatically registered via Composer auto-discovery. You can start using the filters immediately.
+
 ## Configuration
 
-### Latte 3 Extension (Standalone)
+### Nette DI (Recommended)
+
+When using Nette DI container, the extension is **automatically registered** via Composer auto-discovery. No manual configuration needed!
+
+If auto-discovery is disabled, manually register the DI extension in `config.neon`:
+
+```neon
+extensions:
+	trejjam.latte: Trejjam\Latte\DI\LatteExtension
+```
+
+This automatically adds all filters to your Latte engine.
+
+### Manual Latte Extension Registration
+
+If you prefer to register the Latte extension directly (without the DI extension):
+
+```neon
+latte:
+	extensions:
+		- Trejjam\Latte\TrejjamLatteExtension
+```
+
+### Standalone (Without Nette DI)
 
 For **latte-lint** or other tools without Nette DI:
 
 ```php
 $latte = new Latte\Engine();
 $latte->addExtension(new Trejjam\Latte\TrejjamLatteExtension());
-```
-
-### Nette Configuration
-
-Via Nette configuration (`config.neon`):
-
-```neon
-latte:
-	extensions:
-		- Trejjam\Latte\TrejjamLatteExtension
 ```
 
 ## Available Filters
@@ -71,17 +88,17 @@ Encodes value to JSON with granular control options. **HTML-safe by default** (e
 <pre>{$data|json:'pretty'}</pre>
 
 {* Pretty + ASCII-safe (for old browsers) *}
-{$data|json:'pretty':'ascii'}
+{$data|json:'pretty','ascii'}
 
 {* Disable HTML-safety for API responses *}
 {$data|json:'!html'}
 
 {* Force objects + pretty print *}
-{$emptyArray|json:'forceObjects':'pretty'}
+{$emptyArray|json:'forceObjects','pretty'}
 {* Output: {} instead of [] *}
 
 {* Multiple options combined *}
-{$data|json:'pretty':'ascii':'forceObjects'}
+{$data|json:'pretty','ascii','forceObjects'}
 ```
 
 **Default behavior**:
