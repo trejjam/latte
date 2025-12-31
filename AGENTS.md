@@ -13,10 +13,12 @@
 ### Core Commands
 ```bash
 make install    # Install Composer dependencies
-make all        # Run all checks (ECS + PHPStan)
+make all        # Run all checks (ECS + PHPStan + latte-lint + tests)
 make cs         # Check code style with ECS
 make ecsFix     # Auto-fix code style issues
 make phpstan    # Run static analysis (level max)
+make latte-lint # Lint Latte template fixtures
+make test       # Run all tests with Nette Tester
 ```
 
 ### Running Individual Tools
@@ -27,6 +29,17 @@ vendor/bin/ecs check --config=ecs.php src --fix
 
 # Static Analysis (PHPStan)
 vendor/bin/phpstan analyse -c phpstan.neon
+
+# Latte Linting
+php tests/latte-lint-runner.php
+
+# Tests (Nette Tester)
+vendor/bin/tester -C tests                    # Run all tests
+vendor/bin/tester -C tests/TrejjamLatteExtensionTest.php  # Single test file
+vendor/bin/tester -C tests -s                 # Show skipped tests
+
+# Update snapshots (when filter behavior changes intentionally)
+UPDATE_SNAPSHOTS=1 vendor/bin/tester -C tests
 
 # Validate Composer
 composer validate
@@ -227,6 +240,69 @@ Latte filters use **positional parameters** only (colon-separated):
 - **Forward-compatible**: Ignore unknown options silently
 - **Self-documenting**: Option names should match underlying parameter names
 
+## Testing
+
+### Test Framework
+**Nette Tester** - Fast, simple test runner with TAP output
+- Unit tests: `tests/TrejjamLatteExtensionTest.php` (15 test cases)
+- Integration tests: `tests/Integration/LatteRenderingTest.php` (22 test cases)
+- Total: 37 test cases covering filters, rendering, and Latte linting
+
+### Running Tests
+```bash
+# Run all tests
+make test                                      # Via Makefile (recommended)
+vendor/bin/tester -C tests                    # Direct execution
+
+# Run single test file (provide full path to test file)
+vendor/bin/tester -C tests/TrejjamLatteExtensionTest.php
+vendor/bin/tester -C tests/Integration/LatteRenderingTest.php
+
+# Run specific test method
+# Use file path with test class - Nette Tester doesn't support method filtering
+# To run only one method, comment out other test methods temporarily
+
+# Show more output
+vendor/bin/tester -C tests -s                 # Show skipped tests
+vendor/bin/tester -C tests --colors 1         # Force colored output
+```
+
+### Snapshot Testing
+Integration tests use **snapshot verification** (similar to Verify in C# or Jest snapshots):
+- Snapshots stored in: `tests/Integration/__snapshots__/`
+- Verifier: `tests/SnapshotVerifier.php`
+
+**Updating snapshots** when filter behavior changes:
+```bash
+UPDATE_SNAPSHOTS=1 make test
+UPDATE_SNAPSHOTS=1 vendor/bin/tester -C tests
+```
+
+### Test Structure
+```php
+// Unit test example (Nette Tester)
+use Tester\Assert;
+use Tester\TestCase;
+
+final class MyTest extends TestCase
+{
+    public function testSomething() : void
+    {
+        Assert::same('expected', $actual);
+        Assert::type('string', $value);
+        Assert::exception(fn() => throw new \Exception(), \Exception::class);
+    }
+}
+
+(new MyTest())->run();  // REQUIRED at end of file
+```
+
+### Test Fixtures
+Template fixtures: `tests/fixtures/`
+- `filter-test.latte` - Basic filter usage
+- `json-options.latte` - JSON filter comprehensive options
+- `hash-filters.latte` - MD5/SHA1 filters with chaining
+
 ## Git Workflow
 
 **Default Branch**: `main`  
@@ -241,21 +317,12 @@ Short summary (50 chars or less)
 - Reference issues if applicable
 ```
 
-## Testing (Future)
-
-Currently no automated tests. When adding tests:
-```bash
-# Placeholder for future test commands
-vendor/bin/tester tests/
-vendor/bin/phpunit
-```
-
 ## CI/CD
 
 **GitHub Actions**: `.github/workflows/ci.yaml`
-- Tests on PHP 8.2, 8.3, 8.4, 8.5
-- Code style checks (ECS)
-- Static analysis (PHPStan)
+- **QA job**: Code style checks (ECS) on PHP 8.2, 8.3, 8.4, 8.5
+- **Static analysis job**: PHPStan on PHP 8.3
+- **Tests job**: Latte lint + Nette Tester on PHP 8.2, 8.3, 8.4, 8.5
 
 **Dependabot**: Automatic dependency updates
 - Composer packages: daily
