@@ -30,8 +30,6 @@ final class LatteExtension extends CompilerExtension
 	 * Returns configuration schema
 	 *
 	 * Currently minimal - placeholder for future configuration options.
-	 *
-	 * @return Schema
 	 */
 	public function getConfigSchema() : Schema
 	{
@@ -48,8 +46,6 @@ final class LatteExtension extends CompilerExtension
 	 *
 	 * Hooks into the Latte Engine service and adds TrejjamLatteExtension
 	 * to provide json, md5, and sha1 filters.
-	 *
-	 * @return void
 	 */
 	public function beforeCompile() : void
 	{
