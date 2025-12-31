@@ -43,14 +43,6 @@ final class LatteExtension extends CompilerExtension
 	}
 
 	/**
-	 * Load configuration and register services
-	 */
-	public function loadConfiguration() : void
-	{
-		$this->buildLatteExtension();
-	}
-
-	/**
 	 * Register Latte extension before container compilation
 	 *
 	 * Hooks into the Latte Engine factory service and adds TrejjamLatteExtension
@@ -79,7 +71,7 @@ final class LatteExtension extends CompilerExtension
 		// Handle FactoryDefinition (nette/application 3.2+)
 		if ($latteFactoryDefinition instanceof FactoryDefinition) {
 			$latteFactoryDefinition->getResultDefinition()
-				->addSetup('addExtension', [$builder->getDefinition($this->prefix('extension'))]);
+				->addSetup('addExtension', [new TrejjamLatteExtension()]);
 			return;
 		}
 
@@ -87,19 +79,9 @@ final class LatteExtension extends CompilerExtension
 		if ($latteFactoryDefinition instanceof ServiceDefinition) {
 			$latteFactoryDefinition->addSetup(
 				'addExtension',
-				[$builder->getDefinition($this->prefix('extension'))]
+				[new TrejjamLatteExtension()]
 			);
 			return;
 		}
-	}
-
-	/**
-	 * Build and register TrejjamLatteExtension service
-	 */
-	private function buildLatteExtension() : void
-	{
-		$this->getContainerBuilder()->addDefinition($this->prefix('extension'))
-			->setFactory(TrejjamLatteExtension::class)
-			->setAutowired(false);
 	}
 }
