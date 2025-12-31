@@ -6,6 +6,7 @@ namespace Trejjam\Latte\DI;
 
 use Latte\Engine;
 use Nette\DI\CompilerExtension;
+use Nette\DI\Definitions\ServiceDefinition;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use Trejjam\Latte\TrejjamLatteExtension;
@@ -53,6 +54,11 @@ final class LatteExtension extends CompilerExtension
 
 		// Find the Latte Engine service by type
 		$latteDefinition = $builder->getDefinitionByType(Engine::class);
+
+		// Ensure we have a ServiceDefinition (not just Definition)
+		if (!$latteDefinition instanceof ServiceDefinition) {
+			return;
+		}
 
 		// Register TrejjamLatteExtension with the Latte engine
 		$latteDefinition->addSetup(
