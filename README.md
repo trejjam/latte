@@ -25,15 +25,11 @@ Latte 3 template engine extensions and utilities, providing commonly used filter
 composer require trejjam/latte
 ```
 
-**That's it!** If you're using Nette DI, the extension is automatically registered via Composer auto-discovery. You can start using the filters immediately.
-
 ## Configuration
 
 ### Nette DI (Recommended)
 
-When using Nette DI container, the extension is **automatically registered** via Composer auto-discovery. No manual configuration needed!
-
-If auto-discovery is disabled, manually register the DI extension in `config.neon`:
+Register the DI extension in `config.neon`:
 
 ```neon
 extensions:
