@@ -58,7 +58,7 @@
 	},
 	"extra": {
 		"branch-alias": {
-			"dev-main": "v0.2.x-dev"
+			"dev-main": "v0.3.x-dev"
 		},
 		"nette": {
 			"extensions": {

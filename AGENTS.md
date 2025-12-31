@@ -317,6 +317,54 @@ Short summary (50 chars or less)
 - Reference issues if applicable
 ```
 
+### Release Process
+
+**Versioning**: Follows Semantic Versioning (SemVer)
+- **Major** (x.0.0): Breaking changes
+- **Minor** (0.x.0): New features, backward compatible
+- **Patch** (0.0.x): Bug fixes, backward compatible
+
+**Creating a Release**:
+```bash
+# 1. Ensure main branch is up to date
+git checkout main
+git pull origin main
+
+# 2. Update branch alias in composer.json
+# Change "dev-main": "v0.X.x-dev" to next minor version
+# Example: v0.2.x-dev → v0.3.x-dev
+
+# 3. Create and push annotated tag
+git tag -a v0.X.0 -m "Release v0.X.0
+
+## What's Changed
+- Feature/fix description
+- Breaking changes (if any)
+
+## Compatibility
+- PHP versions
+- Dependencies
+
+**Full Changelog**: https://github.com/trejjam/latte/compare/vPREV...v0.X.0"
+
+git push origin v0.X.0
+
+# 4. Create GitHub release
+gh release create v0.X.0 \
+  --title "v0.X.0" \
+  --notes "Release notes with changelog"
+
+# 5. Commit branch alias update
+git add composer.json
+git commit -m "Update branch alias for v0.X.x development"
+git push origin main
+```
+
+**Post-Release**:
+- GitHub release is automatically created
+- Packagist picks up the new tag within minutes
+- CI/CD runs on the tagged commit
+
 ## CI/CD
 
 **GitHub Actions**: `.github/workflows/ci.yaml`
