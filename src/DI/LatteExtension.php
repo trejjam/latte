@@ -65,13 +65,18 @@ final class LatteExtension extends CompilerExtension
 			return;
 		}
 
+		// Register TrejjamLatteExtension as a service
+		$builder->addDefinition($this->prefix('extension'))
+			->setFactory(TrejjamLatteExtension::class)
+			->setAutowired(false);
+
 		// Get the factory definition
 		$latteFactoryDefinition = $builder->getDefinition('latte.latteFactory');
 
 		// Handle FactoryDefinition (nette/application 3.2+)
 		if ($latteFactoryDefinition instanceof FactoryDefinition) {
 			$latteFactoryDefinition->getResultDefinition()
-				->addSetup('addExtension', [new TrejjamLatteExtension()]);
+				->addSetup('addExtension', [$builder->getDefinition($this->prefix('extension'))]);
 			return;
 		}
 
@@ -79,7 +84,7 @@ final class LatteExtension extends CompilerExtension
 		if ($latteFactoryDefinition instanceof ServiceDefinition) {
 			$latteFactoryDefinition->addSetup(
 				'addExtension',
-				[new TrejjamLatteExtension()]
+				[$builder->getDefinition($this->prefix('extension'))]
 			);
 			return;
 		}
