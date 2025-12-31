@@ -69,8 +69,8 @@ final class TrejjamLatteExtension extends Extension
 	 * Usage:
 	 *   {$data|json}                           - basic encoding (HTML-safe by default, returns Html)
 	 *   {$data|json:'pretty'}                  - pretty-printed output (returns Html)
-	 *   {$data|json:'pretty':'ascii'}          - pretty + ASCII-safe (returns Html)
-	 *   {$data|json:'pretty':'!html'}          - pretty + disable HTML-safe (returns string)
+	 *   {$data|json:'pretty','ascii'}          - pretty + ASCII-safe (returns Html)
+	 *   {$data|json:'pretty','!html'}          - pretty + disable HTML-safe (returns string)
 	 *   {$data|json:'forceObjects'}            - force objects (empty arrays as {})
 	 *
 	 * Options (multiple string parameters):

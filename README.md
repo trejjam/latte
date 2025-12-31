@@ -71,17 +71,17 @@ Encodes value to JSON with granular control options. **HTML-safe by default** (e
 <pre>{$data|json:'pretty'}</pre>
 
 {* Pretty + ASCII-safe (for old browsers) *}
-{$data|json:'pretty':'ascii'}
+{$data|json:'pretty','ascii'}
 
 {* Disable HTML-safety for API responses *}
 {$data|json:'!html'}
 
 {* Force objects + pretty print *}
-{$emptyArray|json:'forceObjects':'pretty'}
+{$emptyArray|json:'forceObjects','pretty'}
 {* Output: {} instead of [] *}
 
 {* Multiple options combined *}
-{$data|json:'pretty':'ascii':'forceObjects'}
+{$data|json:'pretty','ascii','forceObjects'}
 ```
 
 **Default behavior**:

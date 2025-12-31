@@ -218,14 +218,14 @@ private function jsonFilter(mixed $input, string ...$options) : string
 ```
 
 ### Filter Usage in Templates
-Latte filters use **positional parameters** only (colon-separated):
+Latte filters use **positional parameters** only (comma-separated):
 
 ```latte
 {* Single option *}
 {$data|json:'pretty'}
 
-{* Multiple options (colon-separated) *}
-{$data|json:'pretty':'ascii'}
+{* Multiple options (comma-separated) *}
+{$data|json:'pretty','ascii'}
 
 {* NOT supported (named arguments don't work in Latte) *}
 {$data|json:pretty='true'}  {* WRONG *}
