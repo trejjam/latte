@@ -7,6 +7,9 @@ use PhpCsFixer\Fixer\ControlStructure\ControlStructureContinuationPositionFixer;
 use PhpCsFixer\Fixer\FunctionNotation\ReturnTypeDeclarationFixer;
 use PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer;
 use PhpCsFixer\Fixer\PhpTag\BlankLineAfterOpeningTagFixer;
+use PhpCsFixer\Fixer\Strict\DeclareStrictTypesFixer;
+use PhpCsFixer\Fixer\Strict\StrictComparisonFixer;
+use PhpCsFixer\Fixer\Strict\StrictParamFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 
 $rootDir = __DIR__ . '/';
@@ -20,7 +23,13 @@ return static function (ECSConfig $ecsConfig) use ($rootDir) : void {
 
 	$ecsConfig->import($rootDir . 'vendor/symplify/easy-coding-standard/config/set/common/namespaces.php');
 
-	$ecsConfig->import($rootDir . 'vendor/symplify/easy-coding-standard/config/set/common/strict.php');
+	// Equivalent of the removed "common/strict" set, which now throws a
+	// DeprecatedException when imported (easy-coding-standard >= 13).
+	$ecsConfig->rules([
+		DeclareStrictTypesFixer::class,
+		StrictComparisonFixer::class,
+		StrictParamFixer::class,
+	]);
 
 	$ecsConfig->import($rootDir . 'vendor/symplify/easy-coding-standard/config/set/clean-code.php');
 
